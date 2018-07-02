@@ -1,8 +1,8 @@
 from math import *
 from random import uniform, randrange
 import random
-from math import *
 import copy
+import pygame
 
 
 class course:
@@ -51,7 +51,7 @@ class candidate:
                     temp_cours.remove(temp_cour)
                 self.schedule.append(temp_cour)
 
-        # print(self.schedule)
+        print(self.schedule)
 
     # set fitness
     def set_fitness(self):
@@ -210,6 +210,14 @@ class beeColony():
 
     def run(self):
         self.init()
+        self.display_width = 800
+        self.display_height = 800
+
+        self.white = (255, 255, 255)
+        self.black = (0, 0, 0)
+        self.linesize = 800
+        temp_best = self.best
+        pygame.init()
         for x in range(self.it):
             self.employeeBee()
             self.spectatorBee()
@@ -217,7 +225,55 @@ class beeColony():
             for y in range(len(self.candidates)):
                 print(self.candidates[y][self.dim - 1].fitness)
             print("---- %i -----" % x)
+            if x == 0:
+                self.draw(99, self.candidates[self.best][self.dim - 1])
 
+            if temp_best != self.best:
+                print("entre")
+                self.draw(99, self.candidates[self.best][self.dim - 1])
+            temp_best = self.best
+        input()
+        pygame.quit()
+        quit()
+
+    def draw(self, vel, cd):
+        
+        self.gameDisplay = pygame.display.set_mode((self.display_width, self.display_height))
+        self.clock = pygame.time.Clock()
+
+        self.gameDisplay.fill(self.black)
+        for x in range(cd.day_hours + 2):
+            self.line(1, (self.display_height / (cd.day_hours + 1)) * (x + 1), 0)
+
+        days = ["lunes", "martes", "miercoles", "jueves", "viernes"]
+        for x in range(len(days)):
+            self.line((self.display_width / (len(days))) * (x + 1), self.display_height, 90)
+
+        for x in range(len(days)):
+            self.message_display(days[x], [((self.display_width / (len(days))) * (x + 1)) - 80, 40], 30)
+            for y in range(cd.day_hours):
+                self.message_display(str(cd.schedule[x + (cd.day_hours - 1 * y)]),
+                                     [(self.display_height / len(days)) * (x + 1) - 80,
+                                      (self.display_height / (cd.day_hours + 1)) * (y + 1) + 40],
+                                      8)
+
+        pygame.display.update()
+        # self.clock.tick(vel)
+
+    def text_objects(self, text, font):
+        textSurface = font.render(text, True, self.white)
+        return textSurface, textSurface.get_rect()
+
+    def message_display(self, text, pos, size):
+        largeText = pygame.font.Font('freesansbold.ttf', size)
+        TextSurf, TextRect = self.text_objects(text, largeText)
+        TextRect.center = (pos[0], pos[1])
+        self.gameDisplay.blit(TextSurf, TextRect)
+
+        pygame.display.update()
+
+    def line(self, thingx, thingy, angle):
+        pygame.draw.line(self.gameDisplay, self.white, [thingx, thingy], [thingx + cos(radians(angle)) * self.linesize, thingy - sin(radians(angle)) * self.linesize], 5)
 
 
 
@@ -242,6 +298,7 @@ cd = candidate(cursos, 8, 2, 1)
 
 # colony size, dimension of space, num of iter and courses
 b_c = beeColony(50, 1, 301, cd)
+
 b_c.run()
 
 print(b_c.candidates[b_c.best][b_c.dim - 1].fitness)

@@ -241,7 +241,7 @@ cursos = [curs1, curs2, curs3, curs4, curs5, curs6, curs7, curs8, curs9, curs10,
 cd = candidate(cursos, 8, 2, 1)
 
 # colony size, dimension of space, num of iter and courses
-b_c = beeColony(50, 1, 1001, cd)
+b_c = beeColony(50, 1, 301, cd)
 b_c.run()
 
 print(b_c.candidates[b_c.best][b_c.dim - 1].fitness)
